@@ -158,7 +158,7 @@ class TestCase
 	}
 
 
-	private function testCaseCheckForDeadlock($callback, $params)
+	public function testCaseCheckForDeadlock($callback, $params)
 	{
 		try {
 			call_user_func_array($callback, $params);
