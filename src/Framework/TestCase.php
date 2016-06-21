@@ -134,13 +134,13 @@ class TestCase
 				try {
 					if ($info['throws']) {
 						$e = Assert::error(function () use ($method, $params) {
-							call_user_func_array([$this, $method->getName()], $params);
+							$this->testCaseCheckForDeadlock([$this, $method->getName()], $params);
 						}, $throws[0], $throws[1]);
 						if ($e instanceof AssertException) {
 							throw $e;
 						}
 					} else {
-						call_user_func_array([$this, $method->getName()], $params);
+						$this->testCaseCheckForDeadlock([$this, $method->getName()], $params);
 					}
 				} catch (\Exception $e) {
 					$this->handleErrors = FALSE;
@@ -154,6 +154,21 @@ class TestCase
 			} catch (AssertException $e) {
 				throw $e->setMessage("$e->origMessage in {$method->getName()}(" . (substr(Dumper::toLine($params), 1, -1)) . ')');
 			}
+		}
+	}
+
+
+	private function testCaseCheckForDeadlock($callback, $params)
+	{
+		try {
+			call_user_func_array($callback, $params);
+		} catch (\Exception $e) {
+			if ($e instanceof \Dibi\DriverException && $e->getCode() === 1213) {
+				$this->tearDown();
+				$this->setUp();
+				return;
+			}
+			throw $e;
 		}
 	}
 
