@@ -166,6 +166,7 @@ class TestCase
 			if ($e instanceof \Dibi\DriverException && $e->getCode() === 1213) {
 				$this->tearDown();
 				$this->setUp();
+				$this->checkForDeadlockCallback($callback, $params);
 				return;
 			}
 			throw $e;
