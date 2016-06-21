@@ -134,13 +134,13 @@ class TestCase
 				try {
 					if ($info['throws']) {
 						$e = Assert::error(function () use ($method, $params) {
-							$this->testCaseCheckForDeadlock([$this, $method->getName()], $params);
+							$this->checkForDeadlockCallback([$this, $method->getName()], $params);
 						}, $throws[0], $throws[1]);
 						if ($e instanceof AssertException) {
 							throw $e;
 						}
 					} else {
-						$this->testCaseCheckForDeadlock([$this, $method->getName()], $params);
+						$this->checkForDeadlockCallback([$this, $method->getName()], $params);
 					}
 				} catch (\Exception $e) {
 					$this->handleErrors = FALSE;
@@ -158,7 +158,7 @@ class TestCase
 	}
 
 
-	public function testCaseCheckForDeadlock($callback, $params)
+	private function checkForDeadlockCallback($callback, $params)
 	{
 		try {
 			call_user_func_array($callback, $params);
